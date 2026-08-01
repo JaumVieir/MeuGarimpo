@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHero, useCheckout } from "@/features/marketing/components/PageShell";
-import { Pricing } from "@/features/marketing/components/Pricing";
-import { Faq } from "@/features/marketing/components/Sections";
+import { PageHero, useCheckout } from "@/components/marketing/PageShell";
+import { Pricing } from "@/components/marketing/Pricing";
+import { Faq } from "@/components/marketing/Sections";
 
 export const Route = createFileRoute("/_marketing/planos")({
   head: () => ({

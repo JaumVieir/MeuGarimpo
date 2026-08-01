@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { PageHero } from "@/features/marketing/components/PageShell";
-import { fieldClass, labelClass } from "@/features/marketing/components/formStyles";
+import { PageHero } from "@/components/marketing/PageShell";
+import { fieldClass, labelClass } from "@/components/marketing/formStyles";
 
 export const Route = createFileRoute("/_marketing/contato")({
   head: () => ({

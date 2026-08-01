@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHero } from "@/features/marketing/components/PageShell";
-import { Features } from "@/features/marketing/components/Sections";
-import { CtaBand } from "@/features/marketing/components/CtaBand";
+import { PageHero } from "@/components/marketing/PageShell";
+import { Features } from "@/components/marketing/Sections";
+import { CtaBand } from "@/components/marketing/CtaBand";
 
 export const Route = createFileRoute("/_marketing/recursos")({
   head: () => ({

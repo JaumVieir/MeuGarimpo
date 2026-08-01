@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCheckout } from "@/features/marketing/components/PageShell";
-import { Hero } from "@/features/marketing/components/Hero";
-import { Steps, Features, Audience, Faq } from "@/features/marketing/components/Sections";
-import { Pricing } from "@/features/marketing/components/Pricing";
+import { useCheckout } from "@/components/marketing/PageShell";
+import { Hero } from "@/components/marketing/Hero";
+import { Steps, Features, Audience, Faq } from "@/components/marketing/Sections";
+import { Pricing } from "@/components/marketing/Pricing";
 
 export const Route = createFileRoute("/_marketing/")({
   head: () => ({

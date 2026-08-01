@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { PanelCard } from "@/features/dashboard/components/AppShell";
+import { PanelCard } from "@/components/layout/AppShell";
 import type { AreaMapHandle, MapLayers } from "@/features/area-query/components/AreaMap";
 
 const AreaMap = lazy(() => import("@/features/area-query/components/AreaMap"));

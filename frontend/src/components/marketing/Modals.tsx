@@ -1,6 +1,12 @@
 import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import { plans, type PlanKey } from "./Pricing";
 import { fieldClass, labelClass } from "./formStyles";
+import { useForm } from "react-hook-form";
+import {zodResolver} from '@hookform/resolvers/zod'
+import { CadastroFormValeus, cadastroSchema } from "@/features/auth/schema/cadastroSchema";
+import { useMutation } from "@tanstack/react-query";
+import { usuarioService } from "@/features/auth/api/usuarios";
 
 function Modal({
   open,
@@ -162,6 +168,81 @@ function maskCpf(v: string) {
     .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
 }
 
+function CheckoutForm({ plan, onDone }: { plan: PlanKey; onDone: () => void }) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CadastroFormValeus>({ resolver: zodResolver(cadastroSchema) });
+
+  const cadastroMutation = useMutation({
+    mutationFn: (values: CadastroFormValeus) =>
+      usuarioService.cadastro({
+        nome: values.nome,
+        telefone: values.telefone,
+        email: values.email,
+        senha: values.senha,
+        plano: plan,
+        status: "pendente",
+      }),
+    onSuccess: () => {
+      toast.success("Cadastro realizado!", {
+        description: "Enviamos os próximos passos para o seu WhatsApp.",
+      });
+      onDone();
+    },
+    onError: (error) => {
+      toast.error("Não foi possível concluir o cadastro", {
+        description: error.message,
+      });
+    },
+  });
+
+  const onSubmit = handleSubmit((values) => cadastroMutation.mutate(values));
+
+  return (
+    <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+      <div>
+        <span className={label}>Nome completo</span>
+        <input className={field} placeholder="Seu nome" {...register("nome")} />
+        {errors.nome && <p className="mt-1.5 text-xs font-medium text-destructive">{errors.nome.message}</p>}
+      </div>
+
+      <div>
+        <span className={label}>WhatsApp</span>
+        <input className={field} placeholder="(00) 00000-0000" {...register("telefone")} />
+        {errors.telefone && (
+          <p className="mt-1.5 text-xs font-medium text-destructive">{errors.telefone.message}</p>
+        )}
+      </div>
+
+      <div>
+        <span className={label}>E-mail</span>
+        <input type="email" className={field} placeholder="voce@email.com" {...register("email")} />
+        {errors.email && <p className="mt-1.5 text-xs font-medium text-destructive">{errors.email.message}</p>}
+      </div>
+
+      <div>
+        <span className={label}>Senha</span>
+        <input
+          type="password"
+          className={field}
+          placeholder="Mínimo 8 caracteres"
+          {...register("senha")}
+        />
+        {errors.senha && <p className="mt-1.5 text-xs font-medium text-destructive">{errors.senha.message}</p>}
+      </div>
+
+      <button
+        disabled={cadastroMutation.isPending}
+        className="mt-2 w-full rounded-full bg-gradient-gold py-3.5 font-display text-sm font-bold text-primary-foreground disabled:opacity-70"
+      >
+        {cadastroMutation.isPending ? "Enviando..." : "Cadastrar"}
+      </button>
+    </form>
+  );
+}
+
 export function CheckoutModal({
   open,
   onClose,
@@ -171,84 +252,22 @@ export function CheckoutModal({
   onClose: () => void;
   plan: PlanKey;
 }) {
-  const [method, setMethod] = useState<(typeof methods)[number]["k"]>("pix");
-  const [phone, setPhone] = useState("");
-  const [cpf, setCpf] = useState("");
-  const p = plans[plan];
-
   return (
     <Modal open={open} onClose={onClose} wide>
-      <div className="grain bg-gradient-earth px-8 py-6 text-cream">
-        <p className="text-xs font-semibold tracking-widest uppercase opacity-60">Assinatura</p>
-        <p className="mt-1 font-display text-xl font-extrabold">
-          Plano {p.name} ·{" "}
-          <span className="text-gold-glow">
-            R$ {p.monthly.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}/mês
-          </span>
+      <div className="p-8">
+        <h3 className="font-display text-2xl font-extrabold">
+          Assinar plano {plans[plan].name}
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          R${" "}
+          {plans[plan].monthly.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+          /mês
         </p>
+        <CheckoutForm plan={plan} onDone={onClose} />
       </div>
-
-      <form className="p-8" onSubmit={(e) => e.preventDefault()}>
-        <span className={label}>Forma de pagamento</span>
-        <div className="grid grid-cols-3 gap-2">
-          {methods.map((m) => (
-            <button
-              key={m.k}
-              type="button"
-              onClick={() => setMethod(m.k)}
-              className={`rounded-lg border px-3 py-3 text-sm font-semibold transition-colors ${
-                method === m.k
-                  ? "border-gold bg-accent text-earth"
-                  : "border-border text-muted-foreground hover:bg-secondary"
-              }`}
-            >
-              <span className="block text-lg">{m.icon}</span>
-              {m.l}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          {methods.find((m) => m.k === method)!.help}
-        </p>
-
-        <div className="mt-6 space-y-4">
-          <div>
-            <span className={label}>Nome completo</span>
-            <input className={field} placeholder="Seu nome" />
-          </div>
-          <div>
-            <span className={label}>WhatsApp</span>
-            <input
-              className={field}
-              value={phone}
-              onChange={(e) => setPhone(maskPhone(e.target.value))}
-              placeholder="(00) 00000-0000"
-              inputMode="numeric"
-            />
-          </div>
-          <div>
-            <span className={label}>E-mail</span>
-            <input type="email" className={field} placeholder="voce@email.com" />
-          </div>
-          <div>
-            <span className={label}>CPF</span>
-            <input
-              className={field}
-              value={cpf}
-              onChange={(e) => setCpf(maskCpf(e.target.value))}
-              placeholder="000.000.000-00"
-              inputMode="numeric"
-            />
-          </div>
-        </div>
-
-        <button className="mt-6 w-full rounded-full bg-gradient-gold py-3.5 font-display text-sm font-bold text-primary-foreground">
-          {method === "pix" ? "Gerar PIX" : "Ir para o pagamento"}
-        </button>
-        <p className="mt-3 text-center text-[11px] text-muted-foreground">
-          🔒 Pagamento processado com segurança. Não armazenamos dados do cartão.
-        </p>
-      </form>
     </Modal>
   );
 }

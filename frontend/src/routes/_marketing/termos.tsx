@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHero } from "@/features/marketing/components/PageShell";
+import { PageHero } from "@/components/marketing/PageShell";
 
 export const Route = createFileRoute("/_marketing/termos")({
   head: () => ({
