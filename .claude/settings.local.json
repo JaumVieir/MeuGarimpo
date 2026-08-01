@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp components/landing/Hero.tsx features/marketing/components/Hero.tsx)",
+      "Bash(cp components/landing/Sections.tsx features/marketing/components/Sections.tsx)",
+      "Bash(cp components/landing/Pricing.tsx features/marketing/components/Pricing.tsx)",
+      "Bash(cp components/landing/CtaBand.tsx features/marketing/components/CtaBand.tsx)",
+      "Bash(cp components/landing/SupportWidget.tsx features/marketing/components/SupportWidget.tsx)"
+    ]
+  }
+}

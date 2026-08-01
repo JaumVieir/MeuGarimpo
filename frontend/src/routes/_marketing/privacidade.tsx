@@ -1,0 +1,49 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { PageHero } from "@/features/marketing/components/PageShell";
+
+export const Route = createFileRoute("/_marketing/privacidade")({
+  head: () => ({
+    meta: [
+      { title: "Política de Privacidade — Meu Garimpo" },
+      {
+        name: "description",
+        content:
+          "Como o Meu Garimpo coleta, usa e protege seus dados pessoais, em conformidade com a LGPD.",
+      },
+      { property: "og:title", content: "Política de Privacidade — Meu Garimpo" },
+      { property: "og:description", content: "Tratamento de dados pessoais conforme a LGPD." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Page,
+});
+
+const blocks = [
+  ["Dados que coletamos", "Nome, e-mail, WhatsApp e CPF informados na contratação, além do histórico de consultas realizadas."],
+  ["Como usamos", "Para autenticar seu acesso, entregar as consultas solicitadas, emitir cobranças e enviar alertas das áreas monitoradas."],
+  ["Pagamentos", "Os pagamentos são processados por parceiros certificados. Não armazenamos dados de cartão em nossos servidores."],
+  ["Compartilhamento", "Não vendemos seus dados. Compartilhamos apenas o necessário com processadores de pagamento e provedores de infraestrutura."],
+  ["Seus direitos", "Você pode solicitar acesso, correção ou exclusão dos seus dados a qualquer momento pelo nosso canal de contato."],
+  ["Retenção", "Mantemos os dados enquanto durar a assinatura e pelo prazo legal exigido após o encerramento."],
+];
+
+function Page() {
+  return (
+    <>
+      <PageHero
+        kicker="Legal"
+        title="Política de Privacidade"
+        description="Transparência sobre quais dados tratamos e para quê."
+      />
+      <section className="mx-auto max-w-3xl space-y-6 px-5 pb-20">
+        {blocks.map(([t, d]) => (
+          <article key={t} className="rounded-xl border border-border bg-card p-6 shadow-soft">
+            <h2 className="font-display text-lg font-bold">{t}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
+          </article>
+        ))}
+      </section>
+    </>
+  );
+}
