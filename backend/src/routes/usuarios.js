@@ -51,6 +51,44 @@ router.post('/', async(req,res) =>{
     }
 })
 
+router.post('/login', async(req,res)=>{
+    try{
+        const {email, senha} = req.body;
+
+        const resultado = await pool.query('SELECT * FROM USUARIOS WHERE email = $1', [email]);
+        const usuario = resultado.rows[0];
+
+        if(!usuario){
+            return res.status(401).json({error: 'Credenciais inválidas!'});
+        }
+
+        if(usuario.tentativas_login >=3){
+            return res.status(401).json({error:'Usuário Bloqueado, entre em contato com suporte!'});
+        }
+
+        const validaSenha = await bcrypt.compare(senha, usuario.senha_hash);
+        if(!validaSenha){
+            await pool.query('UPDATE USUARIOS SET tentativas_login = tentativas_login + 1 WHERE email = $1', [email])
+
+            return res.status(401).json({error:'Credenciais inválidas!'});
+        }
+
+        await pool.query('UPDATE USUARIOS SET tentativas_login = 0 WHERE email = $1',[email]);
+
+        const token = jwt.sign(
+            {userId: usuario.id, email: usuario.email},
+            process.env.JWT_SECRET,
+            {expiresIn: '1d'}
+        );
+
+        res.json({
+            token,
+            usuario:{id:usuario.id, nome: usuario.nome, email: usuario.email}
+        });
+    }catch(error){
+        res.status(500).json({error : 'Erro ao realizar login'});
+    }
+})
 
 
 export default router;
